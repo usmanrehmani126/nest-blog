@@ -8,6 +8,15 @@ const ormConfig: PostgresConnectionOptions = {
   username: 'postgres',
   password: '1234',
   database: 'socialdatabase',
+  entities: [__dirname + '/**/*.entity.js'],
+  migrations: [__dirname + '/**/*.migration.js'],
+  subscribers: [__dirname + '/**/*.subscriber.js'],
+  synchronize: true,
+  // cli: {
+  //   entitiesDir: 'src/entity',
+  //   migrationsDir: 'src/migration',
+  //   subscribersDir: 'src/subscriber',
+  // },
 };
 
 export default ormConfig;
