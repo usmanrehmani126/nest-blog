@@ -1,6 +1,6 @@
 import { CreateUserDTO } from '@/user/dto/createUser.dto';
 import { UserEntity } from '@/user/entity/user.entity';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -11,8 +11,12 @@ export class UserService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
   async createUser(createUserDTO: CreateUserDTO) {
-    const newUser = new UserEntity();
-    Object.assign(newUser, createUserDTO);
-    return await this.userRepository.save(newUser);
+    try {
+      const newUser = new UserEntity();
+      Object.assign(newUser, createUserDTO);
+      return await this.userRepository.save(newUser);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 }
