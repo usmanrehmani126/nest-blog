@@ -12,11 +12,18 @@ export class UserService {
   ) {}
   async createUser(createUserDTO: CreateUserDTO) {
     try {
-      const newUser = new UserEntity();
-      Object.assign(newUser, createUserDTO);
-      return await this.userRepository.save(newUser);
+      const user = new UserEntity();
+      Object.assign(user, createUserDTO);
+      const newUser= await this.userRepository.save(user);
+      return this.generateUserResponse(newUser);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
+  }
+
+  generateUserResponse(user: UserEntity) {
+    return {
+      user,
+    };
   }
 }

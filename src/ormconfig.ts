@@ -11,7 +11,7 @@ const config: PostgresConnectionOptions = {
   database: 'socialdatabase',
   entities: [__dirname + '/**/*.entity.{js,ts}'],
   migrationsTableName: 'migrations',
-  migrations: [__dirname + '/migration/**/*.ts'],
+  migrations: [__dirname + '/migrations/**/*.ts'],
 };
 
 const appDataSource = new DataSource(config);
