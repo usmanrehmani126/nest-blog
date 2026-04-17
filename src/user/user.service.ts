@@ -17,6 +17,20 @@ export class UserService {
     try {
       const user = new UserEntity();
       Object.assign(user, createUserDTO);
+
+      const userByEmail = await this.userRepository.findOne({
+        where: { email: createUserDTO.email },
+      });
+      const userByUserName = await this.userRepository.findOne({
+        where: { username: createUserDTO.username },
+      });
+
+      if (userByEmail || userByUserName) {
+        throw new BadRequestException(
+          'User with this email or username already exists',
+        );
+      }
+
       const newUser = await this.userRepository.save(user);
       return this.generateUserResponse(newUser);
     } catch (error) {
