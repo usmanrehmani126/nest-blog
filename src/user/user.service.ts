@@ -1,10 +1,12 @@
 import { CreateUserDTO } from '@/user/dto/createUser.dto';
+import { LoginUserDTO } from '@/user/dto/loginUser.dto';
 import { IUserResponse } from '@/user/entity/interfaces/userResponse.interface';
 import { UserEntity } from '@/user/entity/user.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { sign } from 'jsonwebtoken';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -33,6 +35,28 @@ export class UserService {
 
       const newUser = await this.userRepository.save(user);
       return this.generateUserResponse(newUser);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async loginUser(loginDTO: LoginUserDTO): Promise<UserEntity> {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { email: loginDTO.email },
+      });
+      if (!user) {
+        throw new BadRequestException('User not found');
+      }
+      const isMatch = await bcrypt.compare(
+        loginDTO.password,
+        user.password as string,
+      );
+      if (!isMatch) {
+        throw new BadRequestException('Invalid password');
+      }
+      delete user.password;
+      return user;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
