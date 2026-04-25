@@ -4,6 +4,7 @@ import { CreateUserDTO } from '@/user/dto/createUser.dto';
 import { LoginUserDTO } from '@/user/dto/loginUser.dto';
 import { IUserResponse } from '@/user/entity/interfaces/userResponse.interface';
 import { UserEntity } from '@/user/entity/user.entity';
+import { AuthGuard } from '@/user/guards/auth.guards';
 import { UserService } from '@/user/user.service';
 import {
   Body,
@@ -13,6 +14,7 @@ import {
   UsePipes,
   Get,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 
 @Controller()
@@ -37,6 +39,7 @@ export class UserController {
   }
 
   @Get('user')
+  @UseGuards(AuthGuard)
   async getCurrentUser(@CustomUserDecorator() user:UserEntity): Promise<IUserResponse> {
     return this.userService.generateUserResponse(user);
   }

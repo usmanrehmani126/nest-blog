@@ -96,9 +96,6 @@ export class UserService {
   }
 
   generateUserResponse(user: UserEntity): IUserResponse {
-    if (!user.id) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-    }
     return {
       user: { ...user, token: this.generateToken(user) },
     };
