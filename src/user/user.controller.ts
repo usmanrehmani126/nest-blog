@@ -1,4 +1,5 @@
 import type { AuthRequest } from '@/types/expressRequest.interface';
+import { CustomUserDecorator } from '@/user/decorators/user.decorators';
 import { CreateUserDTO } from '@/user/dto/createUser.dto';
 import { LoginUserDTO } from '@/user/dto/loginUser.dto';
 import { IUserResponse } from '@/user/entity/interfaces/userResponse.interface';
@@ -36,7 +37,7 @@ export class UserController {
   }
 
   @Get('user')
-  async getCurrentUser(@Req() request: AuthRequest): Promise<IUserResponse> {
-    return this.userService.generateUserResponse(request.user);
+  async getCurrentUser(@CustomUserDecorator() user:UserEntity): Promise<IUserResponse> {
+    return this.userService.generateUserResponse(user);
   }
 }
