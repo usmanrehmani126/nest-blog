@@ -2,7 +2,12 @@ import { CreateUserDTO } from '@/user/dto/createUser.dto';
 import { LoginUserDTO } from '@/user/dto/loginUser.dto';
 import { IUserResponse } from '@/user/entity/interfaces/userResponse.interface';
 import { UserEntity } from '@/user/entity/user.entity';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { sign } from 'jsonwebtoken';
 import { Repository } from 'typeorm';
@@ -62,6 +67,20 @@ export class UserService {
     }
   }
 
+  async findById(id: number): Promise<UserEntity> {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { id },
+      });
+      if (!user) {
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      }
+      return user;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
   generateToken(user: UserEntity): string {
     return sign(
       {
@@ -77,6 +96,9 @@ export class UserService {
   }
 
   generateUserResponse(user: UserEntity): IUserResponse {
+    if (!user.id) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
     return {
       user: { ...user, token: this.generateToken(user) },
     };
