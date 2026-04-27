@@ -12,6 +12,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { sign } from 'jsonwebtoken';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { UpdateUserDto } from './dto/updateUser.dto';
 
 @Injectable()
 export class UserService {
@@ -78,6 +79,16 @@ export class UserService {
       return user;
     } catch (error) {
       throw new BadRequestException(error.message);
+    }
+  }
+
+  async updateUser(userId:number,updateUserDTO:UpdateUserDto){
+    try {
+      const user=await this.findById(userId);
+      Object.assign(user,updateUserDTO);
+      return await this.userRepository.save(user);
+    } catch (error) {
+      throw new BadRequestException('Failed to update user');
     }
   }
 
