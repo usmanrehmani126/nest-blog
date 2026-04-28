@@ -40,6 +40,7 @@ export class UserService {
       }
 
       const newUser = await this.userRepository.save(user);
+      console.log(newUser,'newUser_______')
       return this.generateUserResponse(newUser);
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -85,7 +86,11 @@ export class UserService {
   async updateUser(userId:number,updateUserDTO:UpdateUserDto){
     try {
       const user=await this.findById(userId);
-      Object.assign(user,updateUserDTO);
+      // Object.assign(user,updateUserDTO);
+      user.username = updateUserDTO.username ?? user.username;
+      user.email = updateUserDTO.email ?? user.email;
+      user.bio = updateUserDTO.bio ?? user.bio;
+      user.image = updateUserDTO.image ?? user.image;
       return await this.userRepository.save(user);
     } catch (error) {
       throw new BadRequestException('Failed to update user');
