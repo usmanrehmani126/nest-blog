@@ -8,6 +8,7 @@ import { tagModule } from './tag/tag.module';
 import ormConfig from './ormconfig';
 import { UserModule } from '@/user/user.module';
 import { ConfigModule } from '@nestjs/config';
+import { ArticleModule } from './articles/article.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ConfigModule } from '@nestjs/config';
     }),
     tagModule,
     UserModule,
+    ArticleModule
   ],
   controllers: [AppController],
   providers: [AppService],
