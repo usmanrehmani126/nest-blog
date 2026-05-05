@@ -4,7 +4,7 @@ import { IArticleResponse } from '@/articles/types/articlesResponse.interface';
 import { CustomUserDecorator } from '@/user/decorators/user.decorators';
 import { UserEntity } from '@/user/entity/user.entity';
 import { AuthGuard } from '@/user/guards/auth.guards';
-import { Body, Controller, Get, Param, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 
 @Controller('articles')
 export class ArticleController {
@@ -25,8 +25,17 @@ export class ArticleController {
   }
 
   @Get(':slug')
-  async getArticles(@Param('slug') slug:string):Promise<IArticleResponse>{
-   const article=await this.articleService.getArticle(slug)
-   return this.articleService.generateArticleResponse(article)
+  async getArticles(@Param('slug') slug: string): Promise<IArticleResponse> {
+    const article = await this.articleService.getArticle(slug);
+    return this.articleService.generateArticleResponse(article);
+  }
+
+  @Delete(':slug')
+  @UseGuards(AuthGuard)
+  async deleteArticle(
+    @Param('slug') slug: string,
+    @CustomUserDecorator('id') currentUserId: number,
+  ) {
+    return await this.articleService.deleteArticleBySlug(slug, currentUserId);
   }
 }
