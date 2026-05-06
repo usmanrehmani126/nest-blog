@@ -4,7 +4,20 @@ import { IArticleResponse } from '@/articles/types/articlesResponse.interface';
 import { CustomUserDecorator } from '@/user/decorators/user.decorators';
 import { UserEntity } from '@/user/entity/user.entity';
 import { AuthGuard } from '@/user/guards/auth.guards';
-import { Body, Controller, Delete, Get, Param, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
+import { UpdateArticleDto } from './dto/updateArticle.dto';
+import { ArticleEntity } from './entity/article.entity';
 
 @Controller('articles')
 export class ArticleController {
@@ -30,6 +43,16 @@ export class ArticleController {
     return this.articleService.generateArticleResponse(article);
   }
 
+  @Get()
+  async getAllArticles() {
+    const articles = await this.articleService.getAllArticles();
+    return articles.map(
+      (article: ArticleEntity) =>
+        // this.articleService.generateArticleResponse(article),
+        article,
+    );
+  }
+
   @Delete(':slug')
   @UseGuards(AuthGuard)
   async deleteArticle(
@@ -37,5 +60,20 @@ export class ArticleController {
     @CustomUserDecorator('id') currentUserId: number,
   ) {
     return await this.articleService.deleteArticleBySlug(slug, currentUserId);
+  }
+
+  @Put(':slug')
+  @UseGuards(AuthGuard)
+  async updateArticle(
+    @Param('slug') slug: string,
+    @CustomUserDecorator('id') currentUserId: number,
+    @Body('article') updateArticleDTO: UpdateArticleDto,
+  ) {
+    const updatedArticle = await this.articleService.updateArticle(
+      slug,
+      currentUserId,
+      updateArticleDTO,
+    );
+    return this.articleService.generateArticleResponse(updatedArticle);
   }
 }

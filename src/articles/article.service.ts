@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
 import { IArticleResponse } from '@/articles/types/articlesResponse.interface';
 import slugify from 'slugify';
+import { UpdateArticleDto } from './dto/updateArticle.dto';
 @Injectable()
 export class ArticleService {
   constructor(
@@ -37,13 +38,41 @@ export class ArticleService {
     return article;
   }
 
-  async deleteArticleBySlug(slug: string,currentUserId:number): Promise<DeleteResult> {
+  async getAllArticles(): Promise<ArticleEntity[]> {
+    return await this.articleRepository.find();
+  }
+
+  async updateArticle(
+    slug: string,
+    currentUserId: number,
+    updateArticleDTO: UpdateArticleDto,
+  ) {
     const article = await this.findBySlug(slug);
-    console.log(article.author,currentUserId)
     if (article.authorId !== currentUserId) {
-      throw new HttpException('You are not an author of this article', HttpStatus.FORBIDDEN);
+      throw new HttpException(
+        'You are not an author of this article',
+        HttpStatus.FORBIDDEN,
+      );
     }
-    return await this.articleRepository.delete({slug});
+    if (updateArticleDTO.title) {
+      article.slug = this.generateSlug(updateArticleDTO.title);
+    }
+    Object.assign(article, updateArticleDTO);
+    return await this.articleRepository.save(article);
+  }
+
+  async deleteArticleBySlug(
+    slug: string,
+    currentUserId: number,
+  ): Promise<DeleteResult> {
+    const article = await this.findBySlug(slug);
+    if (article.authorId !== currentUserId) {
+      throw new HttpException(
+        'You are not an author of this article',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+    return await this.articleRepository.delete({ slug });
   }
 
   async findBySlug(slug: string): Promise<ArticleEntity> {
@@ -64,4 +93,5 @@ export class ArticleService {
       article,
     };
   }
+  
 }
